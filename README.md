@@ -147,6 +147,6 @@ helm upgrade helloworld ./release/helm/ \
                               --vault-name $AKV_NAME \
                               --name demo42-helloworld-webhook-auth-header \
                               --query value -o tsv) \
-    --uri http://http://jengajenkins.eastus.cloudapp.azure.com//jenkins/generic-webhook-trigger/invoke
+    --uri http://jengajenkins.eastus.cloudapp.azure.com/jenkins/generic-webhook-trigger/invoke
   ```
-
+  
