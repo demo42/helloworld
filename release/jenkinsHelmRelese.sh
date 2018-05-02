@@ -10,11 +10,12 @@ echo TAG:$TAG
 pwd
 case $REPOSITORY in
   demo42/helloworld*)
-    echo helm upgrade demo42-helloworld ./helm/ --reuse-values --set web.image=$REGISTRY/$REPOSITORY:$TAG 
-    helm upgrade demo42-helloworld ./helm/ --reuse-values --set web.image=$REGISTRY/$REPOSITORY:$TAG 
+    echo helm upgrade helloworld ./release/helm/ --reuse-values --set helloworld.image=$REGISTRY/$REPOSITORY:$TAG 
+    helm upgrade helloworld ./release/helm/ --reuse-values --set helloworld.image=$REGISTRY/$REPOSITORY:$TAG 
+
   ;;
   *)
-    echo helm upgrade demo42-helloworld . --reuse-values 
-    helm upgrade demo42-helloworld ./helm/ --reuse-values
+    echo helm upgrade helloworld ./release/helm/ --reuse-values 
+    helm upgrade helloworld ./release/helm/ --reuse-values
   ;;
 esac
