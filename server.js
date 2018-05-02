@@ -4,7 +4,7 @@ var port = 80
 
 var server = http.createServer(function (request, response) {
   response.writeHead(200, {'Content-Type': 'text/plain'})
-  response.end('Hello World - Version: '+process.env.NODE_VERSION)
+  response.end('Hello World 2- Version: '+process.env.NODE_VERSION)
 })
 
 server.listen(port)
