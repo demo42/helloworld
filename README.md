@@ -149,3 +149,4 @@ helm upgrade helloworld ./release/helm/ \
                               --query value -o tsv) \
     --uri http://http://jengajenkins.eastus.cloudapp.azure.com//jenkins/generic-webhook-trigger/invoke
   ```
+
