@@ -127,3 +127,25 @@ helm upgrade helloworld ./release/helm/ \
                                          --query value -o tsv)
 
   ```
+## Create the webhook header
+  Create a value in keyvault to save for future reference
+  ```sh
+  az keyvault secret set \
+    --vault-name $AKV_NAME \
+    --name demo42-helloworld-webhook-auth-header \
+    --value "Authorization: Bearer "[value]
+  ```
+
+## Create ACR Webhook for deployments
+  ```sh
+  az acr webhook create \
+    -r $ACR_NAME \
+    --scope demo42/helloworld:* \
+    --actions push \
+    --name demo42HelloworldEastus \
+    --headers Authorization=$(az keyvault secret show \
+                              --vault-name $AKV_NAME \
+                              --name demo42-helloworld-webhook-auth-header \
+                              --query value -o tsv) \
+    --uri http://http://jengajenkins.eastus.cloudapp.azure.com//jenkins/generic-webhook-trigger/invoke
+  ```
