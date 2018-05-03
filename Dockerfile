@@ -1,5 +1,5 @@
 ARG REGISTRY_NAME=jengademos.azurecr.io/
-FROM ${REGISTRY_NAME}baseimages/node:9
+FROM ${REGISTRY_NAME}baseimages/node:9-alpine
 COPY . /src
 RUN cd /src && npm install
 EXPOSE 80
