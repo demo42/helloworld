@@ -69,10 +69,18 @@ export GIT_TOKEN_NAME=stevelasker-git-access-token # keyvault secret name
 - Update the base image
 
   ```sh
-  az acr build -t baseimages/node:9 \
+  docker build -t baseimages/node:9 \
     -f node-jessie.Dockerfile \
     .
   ```
+- Switch the dockerfile to -alpine
+
+  Update the base image for Apline
+  ```sh
+  docker build -t jengademos.azurecr.io/baseimages/node:9-alpine -f node-alpine.Dockerfile .
+  docker push jengademos.azurecr.io/baseimages/node:9-alpine
+  ```
+
 ## Deploy to AKS
 
 - Get the cluster you're working with
