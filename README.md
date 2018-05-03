@@ -83,8 +83,10 @@ export GIT_TOKEN_NAME=stevelasker-git-access-token # keyvault secret name
 
 ## Update Demo42 Backcolor
   ```sh
-  docker tag jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1-azure jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1
-  docker push jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1
+  docker tag jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1-azure \
+    jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1
+  docker push \
+    jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1
   ```
 ## Deploy to AKS
 
