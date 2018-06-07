@@ -1,4 +1,4 @@
-ARG REGISTRY_NAME=jengademos.azurecr.io/
+ARG REGISTRY_NAME=demo42.azurecr.io/
 FROM ${REGISTRY_NAME}baseimages/node:9-alpine
 COPY . /src
 RUN cd /src && npm install
