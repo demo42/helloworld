@@ -10,6 +10,7 @@ az acr build -t demo42/helloworld:{{.Build.ID}}  .
 ```sh
 az acr build-task create \
   -t demo42/helloworld:{{.Build.ID}} \
+  -t demo42/helloworld:release \
   -n demo42helloworld \
   --context https://github.com/demo42/helloworld \
   --build-arg REGISTRY_NAME=$REGISTRY_NAME \
