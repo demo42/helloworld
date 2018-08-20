@@ -12,23 +12,16 @@ export HELLOWORLD_REPO=https://github.com/[YOUR-REPO]/helloworld
 
 A few presets before doing the demo
 
-### Common Environment Variables
-```sh
-# Replace these values for your configuration
-# I've left our values in, as we use this for our demos, providing some examples
-export ACR_NAME=demo42
-export RESOURCE_GROUP=$ACR_NAME
-# fully qualified url of the registry. 
-# This is where your registry would be
-# Accounts for registries in dogfood or other clouds like .gov, Germany and China
-export REGISTRY_NAME=${ACR_NAME}.azurecr.io/ 
-export AKV_NAME=$ACR_NAME # name of the keyvault
-export GIT_TOKEN_NAME=demo42-git-token # keyvault secret name
-```
+### Base Image
 
 Have a base image for node in the current registry. This will be used later in the demo, but it helps to have it setup now
 
 - See the [base-image-node Readme](https://github.com/demo42/baseimage-node/blob/master/README.md) for more info
+
+### Common Environment Variables
+
+- Using a bash environment, or [Cloud Shell](https://shell.azure.com), paste the [Env Vars](./envVars.md)
+
 
 # Start the Demo
 
