@@ -2,8 +2,26 @@
 ```sh
 az acr build -t baseimages/node:9-alpine -f ./node-alpine.Dockerfile .
 ```
+## Default Registry
+```sh
+az configure --defaults acr=demo42
+```
 
-## HelloWorld Image
+## HelloWorld Build-Task - demo-clean
+```sh
+
+az acr build-task create \
+  -t demo42/helloworld:{{.Build.ID}} \
+  -t demo42/helloworld:release \
+  -n demo42helloworld \
+  --context https://github.com/demo42/helloworld \
+  --git-access-token $(az keyvault secret show \
+                         --vault-name demo42 \
+                         --name demo42-git-token \
+                         --query value -o tsv)
+```
+
+## HelloWorld Image Parameterized
 ```sh
 az acr build -t demo42/helloworld:{{.Build.ID}}  .
 ```
