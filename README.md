@@ -23,14 +23,14 @@ az acr repository show-tags --repository helloworld
 ```sh
 # Replace these values for your configuration
 # I've left our values in, as we use this for our demos, providing some examples
-export ACR_NAME=jengademos
+export ACR_NAME=demo42
 export RESOURCE_GROUP=$ACR_NAME
 # fully qualified url of the registry. 
 # This is where your registry would be
 # Accounts for registries in dogfood or other clouds like .gov, Germany and China
 export REGISTRY_NAME=${ACR_NAME}.azurecr.io/ 
-export AKV_NAME=$ACR_NAME-vault # name of the keyvault
-export GIT_TOKEN_NAME=stevelasker-git-access-token # keyvault secret name
+export AKV_NAME=$ACR_NAME # name of the keyvault
+export GIT_TOKEN_NAME=demo42-git-token # keyvault secret name
 ```
 
 ## Create a build task
@@ -43,13 +43,13 @@ export GIT_TOKEN_NAME=stevelasker-git-access-token # keyvault secret name
   ```
 - Create the build task
   ```sh
-  az acr build-task create \
-    -n helloworld \
-    -c https://github.com/demo42/helloworld \
-    -t demo42/helloworld:{{.Build.ID}} \
-    --cpu 2 \
-    --git-access-token=$PAT
-  ```
+az acr build-task create \
+  -t demo42/helloworld:{{.Build.ID}} \
+  -t demo42/helloworld:release \
+  -n demo42helloworld \
+  --context https://github.com/demo42/helloworld \
+  --git-access-token $PAT
+```
 
 - Commit a code change
   
