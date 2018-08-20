@@ -79,27 +79,21 @@ Have a base image for node in the current registry. This will be used later in t
   ```
 
 - View the change in the deployed App Service
+## Create a Task, triggered by Git Commits
 
-
-## Create a build task
-
-
-- Populate your GIT Personal Access Token
-  ```sh
-  export PAT=$(az keyvault secret show \
-                --vault-name $AKV_NAME \
-                --name $GIT_TOKEN_NAME \
-                --query value -o tsv)
-  ```
+- Switch to (Cloud Shell)[shell.azure.com]
 - Create the build task
   ```sh
-az acr build-task create \
-  -t helloworld:{{.Build.ID}} \
-  -t helloworld:release \
-  -n demo42helloworld \
-  --context https://github.com/demo42/helloworld \
-  --git-access-token $PAT
-```
+  az acr build-task create \
+    -t helloworld:{{.Build.ID}} \
+    -t helloworld:release \
+    -n demo42helloworld \
+    --context https://github.com/demo42/helloworld \
+    --git-access-token $(az keyvault secret show \
+                        --vault-name $AKV_NAME \
+                        --name $GIT_TOKEN_NAME \
+                        --query value -o tsv)
+  ```
 
 - Commit a code change
   
@@ -116,102 +110,11 @@ az acr build-task create \
 
 ## Base Image Updates
 
-- Update the base image
-
+- Update the background color
+- Open baseimage-node\Dockerfile
+- Change the BACKGROUND_COLOR to green, yellow or orange
+- Commit the change 
+-  Monitor the current builds
   ```sh
-  docker build -t baseimages/node:9 \
-    -f node-jessie.Dockerfile \
-    .
+  watch -n1 az acr build-task list-builds 
   ```
-- Switch the dockerfile to -alpine
-
-  Update the base image for Apline
-  ```sh
-  docker build -t jengademos.azurecr.io/baseimages/node:9-alpine -f node-alpine.Dockerfile .
-  docker push jengademos.azurecr.io/baseimages/node:9-alpine
-  ```
-
-## Update Demo42 Backcolor
-  ```sh
-  docker tag jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1-azure \
-    jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1
-  docker push \
-    jengademos.azurecr.io/baseimages/microsoft/aspnetcore-runtime:linux-2.1
-  ```
-## Deploy to AKS
-
-- Get the cluster you're working with
-  ```sh
-  az aks list
-  ```
-
-- get credentials for the cluster
-
-  ```sh
-  az aks get-credentials -n [name] -g [group]
-  ```
-- Set vaiables
-
-  ```sh
-  export HOST=http://demo42-helloworld.eastus.cloudapp.azure.com/
-  export ACR_NAME=jengademos
-  export TAG=aa42
-  export AKV_NAME=jengademoskv
-  ```
-
-- Deploy with Helm
-
-  Set the 
-  ```sh
-  helm install ./release/helm/ -n helloworld \
-  --set helloworld.host=$HOST \
-  --set helloworld.image=jengademos.azurecr.io/demo42/helloworld:$TAG \
-  --set imageCredentials.registry=$ACR_NAME.azurecr.io \
-  --set imageCredentials.username=$(az keyvault secret show \
-                                         --vault-name $AKV_NAME \
-                                         --name $ACR_NAME-pull-usr \
-                                         --query value -o tsv) \
-  --set imageCredentials.password=$(az keyvault secret show \
-                                         --vault-name $AKV_NAME \
-                                         --name $ACR_NAME-pull-pwd \
-                                         --query value -o tsv)
-```
-## Upgrade
-```sh
-helm upgrade helloworld ./release/helm/ \
---reuse-values \
-  --set helloworld.image=jengademos.azurecr.io/demo42/helloworld:$TAG \
-  --set imageCredentials.registry=$ACR_NAME.azurecr.io \
-  --set imageCredentials.username=$(az keyvault secret show \
-                                         --vault-name $AKV_NAME \
-                                         --name $ACR_NAME-pull-usr \
-                                         --query value -o tsv) \
-  --set imageCredentials.password=$(az keyvault secret show \
-                                         --vault-name $AKV_NAME \
-                                         --name $ACR_NAME-pull-pwd \
-                                         --query value -o tsv)
-
-  ```
-## Create the webhook header
-  Create a value in keyvault to save for future reference
-  ```sh
-  az keyvault secret set \
-    --vault-name $AKV_NAME \
-    --name demo42-helloworld-webhook-auth-header \
-    --value "Authorization: Bearer "[value]
-  ```
-
-## Create ACR Webhook for deployments
-  ```sh
-  az acr webhook create \
-    -r $ACR_NAME \
-    --scope demo42/helloworld:* \
-    --actions push \
-    --name demo42HelloworldEastus \
-    --headers Authorization=$(az keyvault secret show \
-                              --vault-name $AKV_NAME \
-                              --name demo42-helloworld-webhook-auth-header \
-                              --query value -o tsv) \
-    --uri http://jengajenkins.eastus.cloudapp.azure.com/jenkins/generic-webhook-trigger/invoke
-  ```
-  
