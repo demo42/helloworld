@@ -7,17 +7,22 @@ steps:
       -t {{.Build.Registry}}/helloworld:release 
       .
     when: ['-']
+
   - id: build-HelloWorld-Test
     build: -t helloworldTest .
     when: ['-']
+
   - id: funcTests
     cmd: {{.Build.Registry}}/helloworld:{{.Build.ID}}
     cmd: build-HelloWorld-Test
     when: ['build-HelloWorld', 'funcTests']
+
   - cmd: docker push {{.Build.Registry}}/helloworld:{{.Build.ID}}
     when: ['build-Helloworld']
+
   - cmd: docker push {{.Build.Registry}}/helloworld:release
     when: ['build-Helloworld']
+
   - cmd: |
       {{.Build.Registry}}/functions/helm 
       upgrade helloworld ./helm/helloworld/ 

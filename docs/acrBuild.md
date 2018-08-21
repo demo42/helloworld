@@ -11,10 +11,9 @@ az configure --defaults acr=demo42
 ```sh
 
 az acr build-task create \
-  -t demo42/helloworld:{{.Build.ID}} \
-  -t demo42/helloworld:release \
+  -t helloworld:{{.Build.ID}} \
+  -t helloworld:release \
   -n demo42helloworld \
-  -f helmTask.yaml \
   --context https://github.com/demo42/helloworld \
   --git-access-token $(az keyvault secret show \
                          --vault-name demo42 \
@@ -24,7 +23,7 @@ az acr build-task create \
 ## Helloworld Build Task for Kubernetes w/Helm
 ```sh
 az acr build-task create \
-  -t demo42/helloworld:{{.Build.ID}} \
+  -t helloworld:{{.Build.ID}} \
   -n demo42helloworldk8 \
   -f helmTask.yaml \
   --context https://github.com/demo42/helloworld \
@@ -40,8 +39,8 @@ az acr build -t demo42/helloworld:{{.Build.ID}}  .
 ```
 ```sh
 az acr build-task create \
-  -t demo42/helloworld:{{.Build.ID}} \
-  -t demo42/helloworld:release \
+  -t helloworld:{{.Build.ID}} \
+  -t helloworld:release \
   -n demo42helloworld \
   --context https://github.com/demo42/helloworld \
   --build-arg REGISTRY_NAME=$REGISTRY_NAME \

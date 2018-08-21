@@ -1,3 +1,4 @@
+# az acr build -t functions/helm:latest .
 FROM microsoft/azure-cli:latest
 
 ENV VERSION v2.9.0
