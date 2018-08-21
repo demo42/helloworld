@@ -1,0 +1,18 @@
+version: 1.0.0
+# Next iteration of ACR Tasks, which support cmd, and build as first class objects
+steps:
+  - id: build-HelloWorld
+    build: -t {{.Build.Registry}}/helloworld:{{.Build.ID}} -t {{.Build.Registry}}/helloworld:release .
+    when: ['-']
+  - id: build-HelloWorld-Test
+    build: -t helloworldTest .
+    when: ['-']
+  - id: funcTests
+    cmd: {{.Build.Registry}}/helloworld:{{.Build.ID}}
+    cmd: build-HelloWorld-Test
+    when: ['build-HelloWorld', 'funcTests']
+  - cmd: docker push {{.Build.Registry}}/helloworld:{{.Build.ID}}
+    when: ['build-Helloworld']
+  - cmd: docker push {{.Build.Registry}}/helloworld:release
+    when: ['build-Helloworld']
+  - cmd: {{.Build.Registry}}/functions/helm upgrade helloworld ./helm/helloworld/ --reuse-values --set helloworld.image=demo42.azurecr.io/helloworld:{{.Build.ID}}
