@@ -1,4 +1,5 @@
 var http = require('http')
+var os = require("os");
 
 var port = 80
 
@@ -10,6 +11,8 @@ var server = http.createServer(function (request, response) {
   response.write('<a href="https://aka.ms/acr/build">https://aka.ms.acr/build</a>');
   response.write('<p>Hello</p>');
   response.write('<p><b>Version:</b> '+process.env.NODE_VERSION+'</p>');
+  response.write('<p><b>HostName:</b> '+os.hostname()+'</p>');
+  
   response.end();
 })
 

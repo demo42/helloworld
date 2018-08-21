@@ -1,5 +1,6 @@
 version: 1.0.0
 steps:
   - run: bash ls
-  - run: build -t helloworld:release .
-  - run: docker images
+  - run: build -t {{.Build.Registry}}/helloworld:release{{.Build.ID}} .
+  - run: docker push {{.Build.Registry}}/helloworld:release{{.Build.ID}} .
+  - run: {{.Build.Registry}}/functions/helm 
