@@ -14,6 +14,19 @@ az acr build-task create \
   -t demo42/helloworld:{{.Build.ID}} \
   -t demo42/helloworld:release \
   -n demo42helloworld \
+  -f helmTask.yaml \
+  --context https://github.com/demo42/helloworld \
+  --git-access-token $(az keyvault secret show \
+                         --vault-name demo42 \
+                         --name demo42-git-token \
+                         --query value -o tsv)
+```
+## Helloworld Build Task for Kubernetes w/Helm
+```sh
+az acr build-task create \
+  -t demo42/helloworld:{{.Build.ID}} \
+  -n demo42helloworldk8 \
+  -f helmTask.yaml \
   --context https://github.com/demo42/helloworld \
   --git-access-token $(az keyvault secret show \
                          --vault-name demo42 \

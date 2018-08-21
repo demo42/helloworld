@@ -55,3 +55,4 @@ typings/
 .env
 
 .DS_Store
+helmFunction/demo42-staging-eus.kubeConfig

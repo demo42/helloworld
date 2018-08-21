@@ -20,3 +20,7 @@ RUN curl -o /tmp/$FILENAME ${HELM_URL} \
   && rm -rf /tmp
 
 ADD ./deploy.sh /deploy.sh
+ADD ./demo42-staging-eus.kubeConfig /demo42-staging-eus.kubeConfig
+env KUBECONFIG=/demo42-staging-eus.kubeConfig
+
+

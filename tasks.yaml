@@ -3,4 +3,4 @@ steps:
   - run: bash ls
   - run: build -t {{.Build.Registry}}/helloworld:release{{.Build.ID}} .
   - run: docker push {{.Build.Registry}}/helloworld:release{{.Build.ID}} .
-  - run: {{.Build.Registry}}/functions/helm 
+  - run: {{.Build.Registry}}/functions/helm ls
