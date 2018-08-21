@@ -1,5 +1,5 @@
 version: 1.0.0
 steps:
   - run: build -t {{.Build.Registry}}/helloworld:{{.Build.ID}} .
-  - run: docker push {{.Build.Registry}}/helloworld:{{.Build.ID}} .
+  - run: docker push {{.Build.Registry}}/helloworld:{{.Build.ID}}
   - run: {{.Build.Registry}}/functions/helm upgrade helloworld ./helm/helloworld/ --reuse-values --set helloworld.image=demo42.azurecr.io/helloworld:{{.Build.ID}}

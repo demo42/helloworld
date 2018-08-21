@@ -15,13 +15,13 @@ steps:
   - id: funcTests
     cmd: {{.Build.Registry}}/helloworld:{{.Build.ID}}
     cmd: build-HelloWorld-Test
-    when: ['build-HelloWorld', 'funcTests']
+    when: ['build-HelloWorld', 'build-HelloWorld-Test']
 
   - cmd: docker push {{.Build.Registry}}/helloworld:{{.Build.ID}}
-    when: ['build-Helloworld']
+    when: ['funcTests']
 
   - cmd: docker push {{.Build.Registry}}/helloworld:release
-    when: ['build-Helloworld']
+    when: ['funcTests']
 
   - cmd: |
       {{.Build.Registry}}/functions/helm 
