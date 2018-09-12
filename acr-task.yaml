@@ -1,13 +1,25 @@
 version: 1.0-preview-1
 steps:
-
-  - build: -t {{.Run.Registry}}/hello-world:{{.Run.ID}}  --file ./src/WebUI/Dockerfile --build-arg REGISTRY_NAME={{.Run.Registry}}/ .
-  - push: ["{{.Run.Registry}}/hello-world:{{.Run.ID}}"]
-  - cmd: cmd.azurecr-test.io/helm upgrade helloworld ./helm/helloworld/ --reuse-values --set helloworld.image={{.Run.Registry}}/hello-world:{{.Run.ID}}
-    env:
-      - TENANT={{.Values.TENANT}}
-      - SP={{.Values.SP}}
-      - PASSWORD={{.Values.PASSWORD}}
-      - CLUSTER_RESOURCE_GROUP={{.Values.CLUSTER_RESOURCE_GROUP}}
-      - CLUSTER_NAME={{.Values.CLUSTER_NAME}}
-  
+  - build: >
+      -t {{.Run.Registry}}/hello-world:{{.Run.ID}}
+      -f ./Dockerfile 
+      --build-arg REGISTRY_NAME={{.Run.Registry}}/ 
+      .
+  - id: hello-world
+    cmd: {{.Run.Registry}}/hello-world:{{.Run.ID}}
+    ports: 
+      - "8000:80"
+    detach: true
+  - cmd: cmd.azurecr-test.io/wget http://hello-world:8000
+  #- push: ["{{.Run.Registry}}/hello-world:{{.Run.ID}}"]
+  # - cmd: >
+  #     cmd.azurecr-test.io/helm:v2.11.0-rc.2 
+  #     helloworld ./helm/helloworld/
+  #     --reuse-values
+  #     --set helloworld.image={{.Run.Registry}}/hello-world:{{.Run.ID}}
+  #   env:
+  #     - TENANT={{.Values.TENANT}}
+  #     - SP={{.Values.SP}}
+  #     - PASSWORD={{.Values.PASSWORD}}
+  #     - CLUSTER_RESOURCE_GROUP={{.Values.CLUSTER_RESOURCE_GROUP}}
+  #     - CLUSTER_NAME={{.Values.CLUSTER_NAME}}

@@ -51,6 +51,10 @@ az acr build-task create \
   --git-access-token $PAT
 ```
 
+Run a quick-task
+```sh
+az acr run -f acr-task.yaml .
+```
 - Commit a code change
   
   Monitor the current builds
