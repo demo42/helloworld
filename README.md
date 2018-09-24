@@ -4,7 +4,7 @@ Sample app for demos
 ## Setup a default registry
 
 ```sh
-export ACR_NAME=jengademos
+export ACR_NAME=demo42
 az configure --defaults acr=$ACR_NAME
 ```
 ## Clone the repo
@@ -33,7 +33,7 @@ export AKV_NAME=$ACR_NAME # name of the keyvault
 export GIT_TOKEN_NAME=demo42-git-token # keyvault secret name
 ```
 
-## Create a build task
+## Create an ACR Task
 - Populate your GIT Personal Access Token
   ```sh
   export PAT=$(az keyvault secret show \
@@ -41,13 +41,15 @@ export GIT_TOKEN_NAME=demo42-git-token # keyvault secret name
                 --name $GIT_TOKEN_NAME \
                 --query value -o tsv)
   ```
-- Create the build task
+- Create the task
   ```sh
-az acr build-task create \
-  -t demo42/helloworld:{{.Build.ID}} \
-  -t demo42/helloworld:release \
-  -n demo42helloworld \
-  --context https://github.com/demo42/helloworld \
+az acr task create \
+  -n helloworld \
+  -t helloworld:{{.Run.ID}} \
+  -t helloworld:latest \
+  -f Dockerfile \
+  --arg REGISTRY_NAME=$REGISTRY_NAME/ \
+  --context https://github.com/demo42/helloworld.git \
   --git-access-token $PAT
 ```
 

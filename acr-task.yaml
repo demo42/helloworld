@@ -6,13 +6,10 @@ steps:
       -f ./Dockerfile 
       --build-arg REGISTRY_NAME={{.Run.Registry}}/ 
       .
-  # - id: hello-world
-  #   cmd: {{.Run.Registry}}/hello-world:{{.Run.ID}}
-  #   ports: 
-  #     - "8000:80"
-  #   detach: true
-  # - cmd: cmd.azurecr-test.io/curl --url http://hello-world:8000
-  #   startDelay: 3
+  - id: hello-world
+    cmd: {{.Run.Registry}}/hello-world:{{.Run.ID}}
+    detach: true
+  - cmd: cmd.azurecr-test.io/curl --url http://hello-world
   - push: 
     - {{.Run.Registry}}/hello-world:{{.Run.ID}}
     - {{.Run.Registry}}/hello-world:latest
