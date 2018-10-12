@@ -50,7 +50,22 @@ az acr task create \
   -f Dockerfile \
   --arg REGISTRY_NAME=$REGISTRY_NAME/ \
   --context https://github.com/demo42/helloworld.git \
-  --git-access-token $PAT
+  --git-access-token $PAT \
+  --set CLUSTER_NAME=demo42-staging-eus \
+  --set CLUSTER_RESOURCE_GROUP=demo42-staging-eus \
+  --set-secret SP=$(az keyvault secret show \
+            --vault-name ${AKV_NAME} \
+            --name demo42-serviceaccount-user \
+            --query value -o tsv) \
+  --set-secret PASSWORD=$(az keyvault secret show \
+            --vault-name ${AKV_NAME} \
+            --name demo42-serviceaccount-pwd \
+            --query value -o tsv) \
+  --set-secret TENANT=$(az keyvault secret show \
+            --vault-name ${AKV_NAME} \
+            --name demo42-serviceaccount-tenant \
+            --query value -o tsv) \
+  --registry $ACR_NAME 
 ```
 
 Run a quick-task
