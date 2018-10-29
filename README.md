@@ -44,10 +44,10 @@ export GIT_TOKEN_NAME=demo42-git-token # keyvault secret name
 - Create the task
   ```sh
 az acr task create \
-  -n helloworld \
+  -n helloworld-multistep \
   -t helloworld:{{.Run.ID}} \
   -t helloworld:latest \
-  -f Dockerfile \
+  -f acr-task.yaml \
   --arg REGISTRY_NAME=$REGISTRY_NAME/ \
   --context https://github.com/demo42/helloworld.git \
   --git-access-token $PAT \
@@ -147,22 +147,28 @@ az acr run -f acr-task.yaml .
                                          --name $ACR_NAME-pull-pwd \
                                          --query value -o tsv)
 ```
+## Helm Package, push
+helm package \
+    --version 1.0.1 \
+    ./helm/helloworld
+
+az acr helm push \
+    ./helloworld-1.0.1.tgz \
+    --force -o table
+
+## Update the local cache
+az acr helm repo add
+
+helm fetch demo42/helloworld
+
+helm repo list
+
 ## Upgrade
 ```sh
-helm upgrade helloworld ./release/helm/ \
---reuse-values \
-  --set helloworld.image=jengademos.azurecr.io/demo42/helloworld:$TAG \
-  --set imageCredentials.registry=$ACR_NAME.azurecr.io \
-  --set imageCredentials.username=$(az keyvault secret show \
-                                         --vault-name $AKV_NAME \
-                                         --name $ACR_NAME-pull-usr \
-                                         --query value -o tsv) \
-  --set imageCredentials.password=$(az keyvault secret show \
-                                         --vault-name $AKV_NAME \
-                                         --name $ACR_NAME-pull-pwd \
-                                         --query value -o tsv)
-
-  ```
+helm upgrade helloworld ./helm/helloworld/ \
+  --reuse-values \
+  --set helloworld.image=demo42.azurecr.io/helloworld:$TAG
+```
 ## Create the webhook header
   Create a value in keyvault to save for future reference
   ```sh
