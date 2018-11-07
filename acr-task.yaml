@@ -15,12 +15,14 @@ steps:
     - {{.Run.Registry}}/hello-world:latest
   - cmd: >
       cmd.azurecr-test.io/helm:v2.11.0-rc.2 
-      helloworld ./helm/helloworld/
-      --reuse-values
-      --set helloworld.image={{.Run.Registry}}/hello-world:{{.Run.ID}}
+    entryPoint: "./deploy.sh"
     env:
       - TENANT={{.Values.TENANT}}
       - SP={{.Values.SP}}
       - PASSWORD={{.Values.PASSWORD}}
       - CLUSTER_RESOURCE_GROUP={{.Values.CLUSTER_RESOURCE_GROUP}}
       - CLUSTER_NAME={{.Values.CLUSTER_NAME}}
+      - ACR_NAME=demo42
+      - APP_NAME=helloworld
+      - RUN_ID=ca5r
+      - RUN_REGISTRY={{.Run.Registry}}
