@@ -24,7 +24,7 @@ az acr helm repo add
 echo -- helm fetch --untar $ACR_NAME/$APP_NAME --
 helm fetch --untar $ACR_NAME/$APP_NAME
 
-echo -- helm upgrade $ACR_NAME ./$APP_NAME --
-helm upgrade $ACR_NAME ./$APP_NAME/ \
+echo -- helm upgrade $APP_NAME ./$APP_NAME --
+helm upgrade $APP_NAME ./$APP_NAME/ \
     --reuse-values \
-    --set web.image=$RUN_REGISTRY/$APP_NAME:$RUN_ID
+    --set helloworld.image=$RUN_REGISTRY/$APP_NAME:$RUN_ID

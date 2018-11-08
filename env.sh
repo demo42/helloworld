@@ -10,6 +10,7 @@ export REGISTRY_NAME=${ACR_NAME}.azurecr.io/
 # AKS Configuration 
 export AKS_CLUSTER_NAME=demo42-eus
 export AKS_RESOURCE_GROUP=demo42-eus
+export HOST=helloworld.eastus.cloudapp.azure.com
 
 # Cloned Github Repo
 export GIT_REPO=https://github.com/demo42/helloworld.git
@@ -19,3 +20,4 @@ export GIT_DEPLOY_REPO=https://github.com/demo42/helloworld-deploy.git
 export AKV_NAME=$ACR_NAME 
 # Token Name within Keyvault
 export GIT_TOKEN_NAME=demo42-git-token 
+

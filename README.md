@@ -153,21 +153,137 @@ With configurations complete, create a *quick build** to validate the configurat
   (https://github.com/Azure/acr/issues/147) for a change to the default sortorder
 
 ## Deploy the Initial Hello World image to AKS
+Before we automate helm chart updates, an initial seeding of the app is required as Helm uses separate commands for install and update. 
 
-> **TODO**: initiate a `helm install` of the hello-world image, including the registry secrets
+- Initialize the helm client environment.
+  ```sh
+  helm init --client-only 
+  ```
 
-## Build and Deploy
-With a basic build complete, we'll transition to building & deploying an image to an AKS cluster.
+- Add a helm repo, which refers to the Azure Container Registry, then list the local Helm repos. 
+
+  ```sh
+  az acr helm repo add
+  helm repo list
+  ```
+  output:
+
+  ```sh
+  NAME    URL
+  stable  https://kubernetes-charts.storage.googleapis.com
+  local   http://127.0.0.1:8879/charts
+  demo42  https://demo42.azurecr.io/helm/v1/repo
+
+  > **Note**: By setting `az configure --defaults acr=demo42`, `az acr helm repo add --name demo42` isn't required
+
+- Package the helm chart from helloworld-deploy [helloworld-deploy](https://github.com/demo42/helloworld-deploy), which should be cloned alongside the helloworld folder
+
+  ```sh
+  helm package \
+    --version 1.0.0 \
+    ../helloworld-deploy/helm/helloworld
+  ```
+
+- Push the packaged helm chart to the registry
+
+  ```sh
+  az acr helm push ./helloworld-1.0.0.tgz
+
+  ```
+- Refresh the local Helm index
+
+  ```sh
+  az acr helm repo add
+  ```
+  
+- Fetch the Helm Chart
+
+    ```sh
+    helm fetch --untar $ACR_NAME/helloworld --untardir ./charts
+    ```
+
+- Set the tag, based on the most recent run-id, excluding latest
+
+  ```sh
+  az acr repository show-tags \
+      --repository helloworld \
+      --orderby time_desc \
+      --detail \
+      --query "[].{Tag:name,LastUpdate:lastUpdateTime}"
+
+  TAG=ca61
+  ```
+
+- Install the initial deployment
+
+  ```sh
+  helm install ./charts/helloworld -n helloworld \
+  --set helloworld.host=$HOST \
+  --set helloworld.image=$ACR_NAME.azurecr.io/helloworld:$TAG \
+  --set imageCredentials.registry=$ACR_NAME.azurecr.io \
+  --set imageCredentials.username=$(az keyvault secret show \
+                                         --vault-name $AKV_NAME \
+                                         --name $ACR_NAME-pull-usr \
+                                         --query value -o tsv) \
+  --set imageCredentials.password=$(az keyvault secret show \
+                                         --vault-name $AKV_NAME \
+                                         --name $ACR_NAME-pull-pwd \
+                                         --query value -o tsv)
+  ```
+- Query for an EXTERNAL_IP address to be provisioned.
+
+  ```sh
+  kubectl get svc
+  ```
+
+- Repeat until `helloworld-nginx-ingress-controller` returns a valid IP under **EXTERNAL-IP**
+
+  ```sh
+  NAME                                       TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                      AGE
+  helloworld-nginx-ingress-controller        LoadBalancer   10.0.235.75    40.117.59.143   80:30120/TCP,443:30141/TCP   21m
+  helloworld-nginx-ingress-default-backend   ClusterIP      10.0.51.179    <none>          80/TCP                       21m
+  helloworld-svc                             ClusterIP      10.0.62.141    <none>          80/TCP                       21m
+  ```
+
+## Assign the static IP a dns name
+
+- Navigate to https://portal.azure.com/
+- Navigate to resource groups
+- Filter resources groups to those starting with MC_
+
+    ![Screenshot of Hidden AKS Resource Group][aks-hidden-resource-group]
+
+- Click into the resource group
+- Click into the public ips, finding the one that has the same IP address as identified above
+
+    ![Screenshot of Hidden AKS Resource Group][aks-public-ips]
+    ![Screenshot of Specific Public IP Configuration][aks-specific-ip]
+
+- Configure (1) the **Public IP**, assigning a notable dns name (2)
+
+    ![Screenshot of DNS Configuration][aks-configure-dns]
+
+- Browse the site, using the DNS name
+
+    ![Screenshot of Hello World Deployed to AKS][browse-hello-world]
+
+At this point, you should have a fully deployed HelloWorld app that looks similar to the above.
+Proceed to the next step to automate container builds
+
+## Automate Build and Deploy
+With a basic/manual build and helm install complete, we'll transition to building & deploying an image to an AKS cluster.
+
 ACR Tasks support multi-step operations, including the execution of a graph of containers. 
 
 The [./acr-task.yaml](./acr-task.yaml) file represents the graph of steps executed:
 
-- build the hello-world image, with two tags
+- build the helloworld image, with two tags
 - run the newly built image, in the task environment, detaching so a quick test can be performed
-- run a quick functional test, using a [curl image](), passing it the url of the hello-world image. The url is based on the `id:` of the task. 
+- run a quick functional test, using a [curl image](), passing it the url of the helloworld image. The url is based on the `id:` of the task. 
 - push the validated image to the registry
 - run the [helm image](https://github.com/AzureCR/cmd/blob/master/helm/Dockerfile), used for helm deployments. 
 
+### Configuring AKS Permissions
 
 To achieve a Helm Chart deployment, permissions to the AKS cluster are required. Since this is a headless service, the previously configured service principal is used. 
 
@@ -247,7 +363,7 @@ With a quick build complete, configure an automated build that triggers on **git
 
 - View the update in the AKS Cluster
 
-  > **TODO**: navigate to the hello-world image, describing how to get the url
+  > **TODO**: navigate to the helloworld image, describing how to get the url
 
 
 ## Base Image Updates
@@ -286,7 +402,7 @@ With a quick build complete, configure an automated build that triggers on **git
   ```sh
   az aks get-credentials -n [name] -g [group]
   ```
-- Set vaiables
+- Set variables
 
   ```sh
   export HOST=http://demo42-helloworld.eastus.cloudapp.azure.com/
@@ -359,5 +475,11 @@ helm upgrade helloworld ./helm/helloworld/ \
 [build-task-new-token-public-repo]: ./docs/build-task-new-token-public-repo.png
 [build-task-new-token-private-repo]: ./docs/build-task-new-token-private-repo.png
 
-[build-task-generated-token]: 
-./docs/build-task-generated-token.png
+[build-task-generated-token]: ./docs/build-task-generated-token.png
+[aks-hidden-resource-group]: ./docs/aks-hidden-resource-group.png
+[aks-public-ips]: ./docs/aks-public-ips.png
+[aks-specific-ip]: ./docs/aks-specific-ip.png
+[aks-configure-dns]: ./docs/aks-configure-dns.png
+[browse-hello-world]: ./docs/browse-hello-world.png
+
+kubectl create secret docker-registry acrdemossecret --docker-server=acrdemos.azurecr.io --docker-username=f635d070-04e2-4abe-95b1-66a2c40837f9 --docker-password=132e00c8-8d77-4eb2-821e-bf5472754503 --docker-email=dont@bother.me
