@@ -235,7 +235,6 @@ Before we automate helm chart updates, an initial seeding of the app is required
                                           --vault-name $AKV_NAME \
                                           --name $ACR_NAME-pull-usr \
                                           --query value -o tsv) \
-    '\n' \
     imageCredentials.password=$(az keyvault secret show \
                                           --vault-name $AKV_NAME \
                                           --name $ACR_NAME-pull-pwd \
