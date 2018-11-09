@@ -7,7 +7,13 @@ A single container sample that covers:
 
 While the readme may see a bit long, we attempt to follow _best practices_, such as using Azure Key Vault to store secrets.
 
-## Fork the Repo
+## Assumptions
+
+- A current version of the [az cli](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest)
+- An existing [AKS cluster configured](https://azure.microsoft.com/services/kubernetes-service/)
+- [Helm Client](https://docs.helm.sh/using_helm/#install-helm) is installed
+
+## Fork the Repos
 To complete the sample, git webhook creation on a repo you own will be required.
 
 - Fork the following repositories: 
@@ -16,8 +22,8 @@ To complete the sample, git webhook creation on a repo you own will be required.
 
 ## Configure your local environment
 
-- Edit [./env.sh](./env.sh) to represent your environment
-- Change directories and apply the environment variables
+- Edit [./env.sh](./env.sh) to represent your specific environment and resource names
+- CD into helloworld and apply the environment variables with [source](https://bash.cyberciti.biz/guide/Source_command)
 
   ```sh
   cd ./helloworld
@@ -30,14 +36,14 @@ To complete the sample, git webhook creation on a repo you own will be required.
   az login
   ```
 
-- Configure a default registry, to avoid having to specify the registry in each `az acr` command
+- Configure a default registry, to avoid having to specify the registry in each `az acr` command. This uses the [env.sh](./env.sh) values set above. 
   ```sh
   az configure --defaults acr=$ACR_NAME
   ```
 
 ## Create a GitHub personal access token
 
-To trigger a build on a commit, ACR Tasks needs a personal access token (PAT) to access the git repository.
+To trigger a build on a commit, [ACR Tasks](https://aka.ms/acr/tasks) needs a personal access token (PAT) to access the git repository.
 
 - Navigate to the PAT creation page on GitHub at https://github.com/settings/tokens/new
 
@@ -71,7 +77,7 @@ Public repos require the following permissions:
     ```
 
 ## Credentials 
-To perform an AKS update using Helm, a service principal is required to pull images from the regsitry and perform run `helm update`. To avoid losing the credentials, while storing them securely, we'll create a service principal, saving the secrets to Azure Key Vault
+To perform an AKS update using Helm, a service principal is required to pull images from the registry and execute `helm update`. To avoid losing the credentials, while storing them securely, we'll create a service principal, saving the secrets to Azure Key Vault
 
 ```sh
 # Create a service principal (SP) with:
@@ -174,8 +180,10 @@ Before we automate helm chart updates, an initial seeding of the app is required
   stable  https://kubernetes-charts.storage.googleapis.com
   local   http://127.0.0.1:8879/charts
   demo42  https://demo42.azurecr.io/helm/v1/repo
+  ```
 
   > **Note**: By setting `az configure --defaults acr=demo42`, `az acr helm repo add --name demo42` isn't required
+
 
 - Package the helm chart from helloworld-deploy [helloworld-deploy](https://github.com/demo42/helloworld-deploy), which should be cloned alongside the helloworld folder
 
@@ -203,7 +211,7 @@ Before we automate helm chart updates, an initial seeding of the app is required
     helm fetch --untar $ACR_NAME/helloworld --untardir ./charts
     ```
 
-- Set the tag, based on the most recent run-id, excluding latest
+- Set the TAG, based on the most recent run-id, excluding latest
 
   ```sh
   az acr repository show-tags \
@@ -211,9 +219,11 @@ Before we automate helm chart updates, an initial seeding of the app is required
       --orderby time_desc \
       --detail \
       --query "[].{Tag:name,LastUpdate:lastUpdateTime}"
+
+  TAG=___
   ```
 
-- Install the initial deployment
+- Helm install the initial deployment
 
   ```sh
   helm install ./charts/helloworld -n helloworld \
@@ -239,53 +249,6 @@ Before we automate helm chart updates, an initial seeding of the app is required
                                           --vault-name $AKV_NAME \
                                           --name $ACR_NAME-pull-pwd \
                                           --query value -o tsv)
-  ```
-- Resetting the registry credentials (secret)
-  ```sh
-  helm upgrade $APP_NAME ./charts/helloworld \
-    --reuse-values \
-    --wait \
-    --set helloworld.image=$ACR_NAME.azurecr.io/helloworld:$TAG \
-    --set imageCredentials.registry=$ACR_NAME.azurecr.io \
-    --set imageCredentials.username=$(az keyvault secret show \
-                                          --vault-name $AKV_NAME \
-                                          --name $ACR_NAME-pull-usr \
-                                          --query value -o tsv) \
-    --set imageCredentials.password=$(az keyvault secret show \
-                                          --vault-name $AKV_NAME \
-                                          --name $ACR_NAME-pull-pwd \
-                                          --query value -o tsv)
-  ```  
-- Resetting the registry credentials, with the `kubectl` cli
-
-  ```sh
-  kubectl create secret \
-    docker-registry acrdemossecret \
-    --docker-server=acrdemos.azurecr.io \
-    --docker-username=$(az keyvault secret show \
-                          --vault-name $AKV_NAME \
-                          --name $ACR_NAME-pull-usr \
-                          --query value -o tsv) \
-   --docker-password=$(az keyvault secret show \
-                          --vault-name $AKV_NAME \
-                          --name $ACR_NAME-pull-pwd \
-                          --query value -o tsv) \
-   --docker-email=dont@bother.me
-  ```
-
-- Verifying the registry crednetials work
-  ```sh
-  docker login $ACR_NAME.azurecr.io \
-    -u $(az keyvault secret show \
-          --vault-name $AKV_NAME \
-          --name $ACR_NAME-pull-usr \
-          --query value -o tsv) \
-    -p $(az keyvault secret show \
-          --vault-name $AKV_NAME \
-          --name $ACR_NAME-pull-pwd \
-          --query value -o tsv)
-  
-  docker pull $ACR_NAME.azurecr.io/helloworld:$TAG
   ```
 
 - Query for an EXTERNAL_IP address to be provisioned.
@@ -530,6 +493,57 @@ helm upgrade helloworld ./helm/helloworld/ \
                               --query value -o tsv) \
     --uri http://jengajenkins.eastus.cloudapp.azure.com/jenkins/generic-webhook-trigger/invoke
   ```
+## Troubleshooting
+
+- Resetting the registry credentials (secret)
+  ```sh
+  helm upgrade $APP_NAME ./charts/helloworld \
+    --reuse-values \
+    --set helloworld.image=$ACR_NAME.azurecr.io/helloworld:$TAG \
+    --set imageCredentials.registry=$ACR_NAME.azurecr.io \
+    --set imageCredentials.username=$(az keyvault secret show \
+                                          --vault-name $AKV_NAME \
+                                          --name $ACR_NAME-pull-usr \
+                                          --query value -o tsv) \
+    --set imageCredentials.password=$(az keyvault secret show \
+                                          --vault-name $AKV_NAME \
+                                          --name $ACR_NAME-pull-pwd \
+                                          --query value -o tsv)
+  ```
+
+- Resetting the registry credentials, with the `kubectl` cli
+
+  ```sh
+  kubectl create secret \
+    docker-registry acrdemossecret \
+    --docker-server=acrdemos.azurecr.io \
+    --docker-username=$(az keyvault secret show \
+                          --vault-name $AKV_NAME \
+                          --name $ACR_NAME-pull-usr \
+                          --query value -o tsv) \
+   --docker-password=$(az keyvault secret show \
+                          --vault-name $AKV_NAME \
+                          --name $ACR_NAME-pull-pwd \
+                          --query value -o tsv) \
+   --docker-email=dont@bother.me
+  ```
+
+- Verifying the registry credentials work
+
+  ```sh
+  docker login $ACR_NAME.azurecr.io \
+    -u $(az keyvault secret show \
+          --vault-name $AKV_NAME \
+          --name $ACR_NAME-pull-usr \
+          --query value -o tsv) \
+    -p $(az keyvault secret show \
+          --vault-name $AKV_NAME \
+          --name $ACR_NAME-pull-pwd \
+          --query value -o tsv)
+  
+  docker pull $ACR_NAME.azurecr.io/helloworld:$TAG
+  ```
+
 [build-task-new-token-public-repo]: ./docs/build-task-new-token-public-repo.png
 [build-task-new-token-private-repo]: ./docs/build-task-new-token-private-repo.png
 
