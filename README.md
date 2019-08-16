@@ -104,7 +104,7 @@ az keyvault secret set \
     --vault-name $AKV_NAME \
     --name $ACR_NAME-deploy-usr \
     --value $(az ad sp show \
-              --id http://$ACR_NAME-pull \
+              --id http://$ACR_NAME-deploy \
               --query appId --output tsv)
 
 # Assign permissions required for Helm Update
@@ -224,9 +224,11 @@ Before we automate helm chart updates, an initial seeding of the app is required
   ```
 
 - Helm install the initial deployment
-
+  
+  Note: using `upgrade` with the `--install` flag allows one command to be used for both install and upgrade. If the named deployment doesn't exist, it will be created. If it does exist, it will be updated. 
   ```sh
-  helm install ./charts/helloworld -n helloworld \
+  helm upgrade helloworld ./charts/helloworld \
+  --install \
   --set helloworld.host=$HOST \
   --set helloworld.image=$ACR_NAME.azurecr.io/helloworld:$TAG \
   --set imageCredentials.registry=$ACR_NAME.azurecr.io \
@@ -238,17 +240,6 @@ Before we automate helm chart updates, an initial seeding of the app is required
                                          --vault-name $AKV_NAME \
                                          --name $ACR_NAME-pull-pwd \
                                          --query value -o tsv)
-  ```
-- Verifying the registry credentials are being retrieved
-  ```sh
-  echo imageCredentials.username=$(az keyvault secret show \
-                                          --vault-name $AKV_NAME \
-                                          --name $ACR_NAME-pull-usr \
-                                          --query value -o tsv) \
-    imageCredentials.password=$(az keyvault secret show \
-                                          --vault-name $AKV_NAME \
-                                          --name $ACR_NAME-pull-pwd \
-                                          --query value -o tsv)
   ```
 
 - Query for an EXTERNAL_IP address to be provisioned.
@@ -267,6 +258,8 @@ Before we automate helm chart updates, an initial seeding of the app is required
   ```
 
 ## Assign the static IP a dns name
+
+To browse the website by a DNS name, find and assign through the Azure Portal.
 
 - Navigate to https://portal.azure.com/
 - Navigate to resource groups
@@ -301,6 +294,9 @@ The [./acr-task.yaml](./acr-task.yaml) file represents the graph of steps execut
 - build the helloworld image, with two tags
 - run the newly built image, in the task environment, detaching so a quick test can be performed
 - run a quick functional test, using a [curl image](), passing it the url of the helloworld image. The url is based on the `id:` of the task. 
+
+> Note: the curl doesn't actually validate the results, yet. This is a good TODO:
+
 - push the validated image to the registry
 - run the [helm image](https://github.com/AzureCR/cmd/blob/master/helm/Dockerfile), used for helm deployments. 
 
@@ -323,11 +319,11 @@ To achieve a Helm Chart deployment, permissions to the AKS cluster are required.
               --query value -o tsv) \
     --set SP=$(az keyvault secret show \
               --vault-name ${AKV_NAME} \
-              --name $ACR_NAME-serviceaccount-user \
+              --name $ACR_NAME-deploy-usr \
               --query value -o tsv) \
     --set PASSWORD=$(az keyvault secret show \
               --vault-name ${AKV_NAME} \
-              --name $ACR_NAME-serviceaccount-pwd \
+              --name $ACR_NAME-deploy-pwd \
               --query value -o tsv) \
     --registry $ACR_NAME 
   ```
@@ -338,7 +334,7 @@ With a quick build complete, configure an automated build that triggers on **git
 - Create an ACR Task with a set of variables used within the task, such as the AKS name and a service principal used for accessing AKS. 
   ```sh
   az acr task create \
-    -n helloworld-multistep \
+    -n helloworld \
     -f acr-task.yaml \
     --context $GIT_REPO \
     --git-access-token $(az keyvault secret show \
@@ -349,15 +345,15 @@ With a quick build complete, configure an automated build that triggers on **git
     --set CLUSTER_RESOURCE_GROUP=$AKS_RESOURCE_GROUP \
     --set-secret TENANT=$(az keyvault secret show \
               --vault-name ${AKV_NAME} \
-              --name $ACR_NAME-serviceaccount-tenant \
+              --name $ACR_NAME-tenant \
               --query value -o tsv) \
     --set-secret SP=$(az keyvault secret show \
               --vault-name ${AKV_NAME} \
-              --name demo42-serviceaccount-user \
+              --name $ACR_NAME-deploy-usr \
               --query value -o tsv) \
     --set-secret PASSWORD=$(az keyvault secret show \
               --vault-name ${AKV_NAME} \
-              --name demo42-serviceaccount-pwd \
+              --name $ACR_NAME-deploy-pwd \
               --query value -o tsv) \
     --registry $ACR_NAME 
   ```
@@ -494,6 +490,19 @@ helm upgrade helloworld ./helm/helloworld/ \
     --uri http://jengajenkins.eastus.cloudapp.azure.com/jenkins/generic-webhook-trigger/invoke
   ```
 ## Troubleshooting
+
+- Verifying the registry credentials are being retrieved
+
+  ```sh
+  echo imageCredentials.username=$(az keyvault secret show \
+                                          --vault-name $AKV_NAME \
+                                          --name $ACR_NAME-pull-usr \
+                                          --query value -o tsv) \
+    imageCredentials.password=$(az keyvault secret show \
+                                          --vault-name $AKV_NAME \
+                                          --name $ACR_NAME-pull-pwd \
+                                          --query value -o tsv)
+  ```
 
 - Resetting the registry credentials (secret)
   ```sh
