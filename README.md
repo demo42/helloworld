@@ -1,4 +1,5 @@
 # Hello world
+
 A single container sample that covers:
 
 - [ACR Tasks](https://aka.ms/acr/tasks) for building & testing container images
@@ -79,7 +80,7 @@ Public repos require the following permissions:
         --value 74fef000b0000a00f000000
     ```
 
-## Credentials 
+## Credentials
 
 To perform an AKS update using Helm, a service principal is required to pull images from the registry and execute `helm update`. To avoid losing the credentials, while storing them securely, we'll create a service principal, saving the secrets to Azure Key Vault
 
@@ -160,9 +161,6 @@ With configurations complete, create a *quick build** to validate the configurat
     --detail \
     --query "[].{Tag:name,LastUpdate:lastUpdateTime}"
   ```
-
-  > See [Issue: #147]
-  (https://github.com/Azure/acr/issues/147) for a change to the default sortorder
 
 ## Deploy the Initial Hello World image to AKS
 
@@ -340,7 +338,7 @@ To achieve a Helm Chart deployment, permissions to the AKS cluster are required.
 
 ## Automatically build helloworld
 
-With a quick build complete, configure an automated build that triggers on **git commits** and **base image updates**. 
+With a quick build complete, configure an automated build that triggers on **git commits** and **base image updates**.
 
 - Create an ACR Task with a set of variables used within the task, such as the AKS name and a service principal used for accessing AKS.
 
@@ -367,7 +365,7 @@ With a quick build complete, configure an automated build that triggers on **git
               --vault-name ${AKV_NAME} \
               --name $ACR_NAME-deploy-pwd \
               --query value -o tsv) \
-    --registry $ACR_NAME 
+    --registry $ACR_NAME
   ```
 
   > With future Task enhancements, a [Microsoft Identity (MSI)](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview ) can be associated with a Task, avoiding the need configure service principal details above.
