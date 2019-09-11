@@ -36,7 +36,8 @@ To complete the sample, git webhook creation on a repo you own will be required.
   az login
   ```
 
-- Configure a default registry, to avoid having to specify the registry in each `az acr` command. This uses the [env.sh](./env.sh) values set above. 
+- Configure a default registry, to avoid having to specify the registry in each `az acr` command. This uses the [env.sh](./env.sh) values set above.
+
   ```sh
   az configure --defaults acr=$ACR_NAME
   ```
@@ -50,6 +51,7 @@ To trigger a build on a commit, [ACR Tasks](https://aka.ms/acr/tasks) needs a pe
 - Enter a short **description** for the token, for example, "ACR Build Task Demo"
 
 ### Public Repos:
+
 Public repos require the following permissions:
 
 - Under **repo**, enable **repo:status** and **public_repo**
@@ -57,13 +59,14 @@ Public repos require the following permissions:
     ![Screenshot of the Public Repo Personal Access Token generation page in GitHub][build-task-new-token-public-repo]
 
 ### Private Repos:
+
 - Private repos: add 
   - **repo**, enable **repo:status**, **repo:repo_deployment**, **repo:public_repo**, **repo:invite**
   - **admin:repo_hook**, enable **write:repo_hook**, **read:repo_hook**
 
     ![Screenshot of the Private Repo Personal Access Token generation page in GitHub][build-task-new-token-private-repo]
 
-### Select the **Generate token** button 
+### Select the **Generate token** button
 
 - Copy the generated token and paste into Key Vault
 
@@ -77,6 +80,7 @@ Public repos require the following permissions:
     ```
 
 ## Credentials 
+
 To perform an AKS update using Helm, a service principal is required to pull images from the registry and execute `helm update`. To avoid losing the credentials, while storing them securely, we'll create a service principal, saving the secrets to Azure Key Vault
 
 ```sh
@@ -130,6 +134,7 @@ az keyvault secret set \
 ```
 
 ## Local (pre-commit) Build
+
 One of the great things about **ACR Tasks** is the ability to run a **quick task** validating the work, before committing to source control.
 
 With configurations complete, create a *quick build** to validate the configurations
@@ -160,11 +165,13 @@ With configurations complete, create a *quick build** to validate the configurat
   (https://github.com/Azure/acr/issues/147) for a change to the default sortorder
 
 ## Deploy the Initial Hello World image to AKS
-Before we automate helm chart updates, an initial seeding of the app is required as Helm uses separate commands for install and update. 
+
+Before we automate helm chart updates, an initial seeding of the app is required as Helm uses separate commands for install and update.
 
 - Initialize the helm client environment.
+
   ```sh
-  helm init --client-only 
+  helm init --client-only
   ```
 
 - Add a helm repo, which refers to the Azure Container Registry, then list the local Helm repos. 
@@ -199,6 +206,7 @@ Before we automate helm chart updates, an initial seeding of the app is required
   az acr helm push ./helloworld-1.0.0.tgz
 
   ```
+
 - Refresh the local Helm index
 
   ```sh
@@ -225,7 +233,8 @@ Before we automate helm chart updates, an initial seeding of the app is required
 
 - Helm install the initial deployment
   
-  Note: using `upgrade` with the `--install` flag allows one command to be used for both install and upgrade. If the named deployment doesn't exist, it will be created. If it does exist, it will be updated. 
+  Note: using `upgrade` with the `--install` flag allows one command to be used for both install and upgrade. If the named deployment doesn't exist, it will be created. If it does exist, it will be updated.
+
   ```sh
   helm upgrade helloworld ./charts/helloworld \
   --install \
@@ -285,6 +294,7 @@ At this point, you should have a fully deployed HelloWorld app that looks simila
 Proceed to the next step to automate container builds
 
 ## Automate Build and Deploy
+
 With a basic/manual build and helm install complete, we'll transition to building & deploying an image to an AKS cluster.
 
 ACR Tasks support multi-step operations, including the execution of a graph of containers. 
@@ -329,9 +339,11 @@ To achieve a Helm Chart deployment, permissions to the AKS cluster are required.
   ```
 
 ## Automatically build helloworld
+
 With a quick build complete, configure an automated build that triggers on **git commits** and **base image updates**. 
 
-- Create an ACR Task with a set of variables used within the task, such as the AKS name and a service principal used for accessing AKS. 
+- Create an ACR Task with a set of variables used within the task, such as the AKS name and a service principal used for accessing AKS.
+
   ```sh
   az acr task create \
     -n helloworld \
@@ -357,13 +369,14 @@ With a quick build complete, configure an automated build that triggers on **git
               --query value -o tsv) \
     --registry $ACR_NAME 
   ```
+
   > With future Task enhancements, a [Microsoft Identity (MSI)](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview ) can be associated with a Task, avoiding the need configure service principal details above.
 
 ### Commit a code change
   
 - Monitor the current builds using a bash environment, including [Azure cloud shell](https://shell.azure.com)
   ```sh
-  watch -n1 az acr build-task list-builds 
+  watch -n1 az acr task list-runs
   ```
 
 - View the current executing task, without having to specify the `--run-id`
