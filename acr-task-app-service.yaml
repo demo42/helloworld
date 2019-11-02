@@ -1,4 +1,4 @@
-version: 1.0-preview-1
+version: v1.0
 steps:
   - build: >
       -t {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
@@ -7,5 +7,5 @@ steps:
       --build-arg REGISTRY_NAME={{.Run.Registry}}/ 
       .
   - push: 
-    - {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
-    - {{.Run.Registry}}/demo42/helloworld:release
+    - "{{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}"
+    - "{{.Run.Registry}}/demo42/helloworld:release"
