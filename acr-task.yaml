@@ -1,28 +1,11 @@
-version: 1.0-preview-1
+version: 1.0
 steps:
   - build: >
       -t {{.Run.Registry}}/helloworld:{{.Run.ID}}
       -t {{.Run.Registry}}/helloworld:latest
       -f ./Dockerfile 
-      --build-arg REGISTRY_NAME={{.Run.Registry}}/ 
+      --build-arg ACR_NAME={{.Run.RegistryName}}/ 
       .
-  - id: helloworld
-    cmd: {{.Run.Registry}}/helloworld:{{.Run.ID}}
-    detach: true
-  - cmd: cmd.azurecr-test.io/curl --url http://helloworld
   - push: 
-    - {{.Run.Registry}}/helloworld:{{.Run.ID}}
-    - {{.Run.Registry}}/helloworld:latest
-  - cmd: >
-      cmd.azurecr-test.io/helm:v2.11.0-rc.2 
-    entryPoint: "./deploy.sh"
-    env:
-      - TENANT={{.Values.TENANT}}
-      - SP={{.Values.SP}}
-      - PASSWORD={{.Values.PASSWORD}}
-      - CLUSTER_RESOURCE_GROUP={{.Values.CLUSTER_RESOURCE_GROUP}}
-      - CLUSTER_NAME={{.Values.CLUSTER_NAME}}
-      - ACR_NAME=demo42
-      - APP_NAME=helloworld
-      - RUN_ID={{.Run.ID}}
-      - RUN_REGISTRY={{.Run.Registry}}
+    - "{{.Run.Registry}}/helloworld:{{.Run.ID}}"
+    - "{{.Run.Registry}}/helloworld:latest"
