@@ -4,7 +4,7 @@ steps:
       -t {{.Run.Registry}}/helloworld:{{.Run.ID}}
       -t {{.Run.Registry}}/helloworld:latest
       -f ./Dockerfile 
-      --build-arg ACR_NAME={{.Run.RegistryName}}/ 
+      --build-arg ACR_NAME={{.Run.RegistryName}}
       .
   - push: 
     - "{{.Run.Registry}}/helloworld:{{.Run.ID}}"
