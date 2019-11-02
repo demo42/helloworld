@@ -1,11 +1,11 @@
 version: v1.0.0
 steps:
   - build: >
-      -t {{.Run.Registry}}/helloworld:{{.Run.ID}}
-      -t {{.Run.Registry}}/helloworld:latest
+      -t {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
+      -t {{.Run.Registry}}/demo42/helloworld:latest
       -f ./Dockerfile 
       --build-arg ACR_NAME={{.Run.RegistryName}}
       .
   - push: 
-    - "{{.Run.Registry}}/helloworld:{{.Run.ID}}"
-    - "{{.Run.Registry}}/helloworld:latest"
+    - "{{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}"
+    - "{{.Run.Registry}}/demo42/helloworld:latest"
