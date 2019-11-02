@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: helloworld
 spec:
-  replicas: 12
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -18,7 +18,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
       - name: helloworld
-        image: demo42t.azurecr.io/demo42/helloworld:cd17
+        image: demo42t.azurecr.io/demo42/helloworld:cd1h
         ports:
         - containerPort: 80
         resources:
