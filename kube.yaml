@@ -18,7 +18,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
       - name: helloworld
-        image: demo42t.azurecr.io/demo42/helloworld:cd1h
+        image: demo42t.azurecr.io/demo42/helloworld:cd2b
         ports:
         - containerPort: 80
         resources:
