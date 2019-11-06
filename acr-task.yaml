@@ -3,9 +3,10 @@ steps:
   - build: >
       -t {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
       -t {{.Run.Registry}}/demo42/helloworld:latest
-      -f ./Dockerfile 
+      -f ./Dockerfile
       --build-arg ACR_NAME={{.Run.RegistryName}}
       .
+    cache: enabled
   - push: 
     - "{{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}"
     - "{{.Run.Registry}}/demo42/helloworld:latest"
