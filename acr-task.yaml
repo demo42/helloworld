@@ -1,12 +1,14 @@
 version: v1.0.0
 steps:
-  - build: >
+  - id: build
+    build: >
       -t {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
       -t {{.Run.Registry}}/demo42/helloworld:latest
       -f ./Dockerfile
       --build-arg ACR_NAME={{.Run.RegistryName}}
       .
-    cache: enabled
-  - push: 
+    #cache: enabled
+  - id: push-images
+    push: 
     - "{{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}"
     - "{{.Run.Registry}}/demo42/helloworld:latest"
