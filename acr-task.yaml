@@ -18,6 +18,6 @@ steps:
       az aks get-credentials 
       -n demo42-dev
       -g demo42-dev-scus
-  - id: helm deploy
+  - id: helm-deploy
     cmd: >
       demo42upstream.azurecr.io/mcr/acr/helm:3 upgrade helloworld ./charts/helloworld/ --reuse-values --set helloworld.image=$Registry/demo42/helloworld:$ID
