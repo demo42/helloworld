@@ -1,14 +1,23 @@
-version: v1.0.0
+version: v1.1.0
 steps:
   - id: build
     build: >
-      -t {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
-      -t {{.Run.Registry}}/demo42/helloworld:latest
+      -t $Registry/demo42/helloworld:$ID
       -f ./Dockerfile
-      --build-arg ACR_NAME={{.Run.RegistryName}}
       .
     #cache: enabled
   - id: push-images
     push: 
-    - "{{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}"
-    - "{{.Run.Registry}}/demo42/helloworld:latest"
+    - "$Registry/demo42/helloworld:$ID"
+  - id: az-login
+    cmd: >
+      az login --identity -o jsonc > /dev/null
+    # login with the identity of the task
+  - id: import-node-to-base-artifacts
+    cmd: >
+      az aks get-credentials 
+      -n demo42-dev
+      -g demo42-dev-scus
+  - id: helm deploy
+    cmd: >
+      demo42upstream.azurecr.io/mcr/acr/helm:3 upgrade helloworld ./charts/helloworld/ --reuse-values --set helloworld.image=$Registry/demo42/helloworld:$ID
