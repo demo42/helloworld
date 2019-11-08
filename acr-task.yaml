@@ -20,4 +20,4 @@ steps:
       -g demo42-dev-scus
   - id: helm-deploy
     cmd: >
-    demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade helloworld ./charts/helloworld/ --reuse-values --set helloworld.image=$Registry/demo42/helloworld:$ID
+      demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade helloworld ./charts/helloworld/ --reuse-values --set helloworld.image=$Registry/demo42/helloworld:$ID
