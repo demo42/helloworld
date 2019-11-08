@@ -13,7 +13,7 @@ steps:
     cmd: >
       az login --identity -o jsonc > /dev/null
     # login with the identity of the task
-  - id: import-node-to-base-artifacts
+  - id: aks-get-credentials
     cmd: >
       az aks get-credentials 
       -n demo42-dev
