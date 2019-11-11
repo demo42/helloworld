@@ -346,7 +346,7 @@ With a quick build complete, configure an automated build that triggers on **git
   az acr task create \
     -n helloworld \
     -f acr-task.yaml \
-    --context $GIT_REPO \
+    --context $GIT_HELLOWORLD \
     --git-access-token $(az keyvault secret show \
                   --vault-name $AKV_NAME \
                   --name $GIT_TOKEN_NAME \
