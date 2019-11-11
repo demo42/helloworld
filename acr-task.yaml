@@ -6,18 +6,23 @@ steps:
       -f ./Dockerfile
       .
     #cache: enabled
+    when: [-]
   - id: push-images
     push: 
     - "$Registry/demo42/helloworld:$ID"
+    when: ['build-hello-world']
   - id: az-login
     cmd: >
       az login --identity -o jsonc > /dev/null
     # login with the identity of the task
+    when: [-]
   - id: aks-get-credentials
     cmd: >
       az aks get-credentials 
       -n demo42-dev
       -g demo42-dev-scus
+    when: ['az-login']
   - id: helm-deploy
     cmd: >
       demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade helloworld ./charts/helloworld/ --reuse-values --set helloworld.image=$Registry/demo42/helloworld:$ID
+    when: ['push-images', 'aks-get-credentials']
