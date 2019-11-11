@@ -1,7 +1,4 @@
 version: v1.1.0
-alias:
-  values:
-    az: mcr.microsoft.com/acr/acr-cli:0.1
 steps:
   - id: build-hello-world
     build: >
