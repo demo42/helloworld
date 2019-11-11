@@ -7,15 +7,15 @@ steps:
       .
     #cache: enabled
     when: [-]
-  - id: push-images
-    push: 
-    - "$Registry/demo42/helloworld:$ID"
-    when: ['build-hello-world']
   - id: az-login
     cmd: >
       az login --identity -o jsonc > /dev/null
     # login with the identity of the task
     when: [-]
+  - id: push-images
+    push: 
+    - "$Registry/demo42/helloworld:$ID"
+    when: ['build-hello-world']
   - id: aks-get-credentials
     cmd: >
       az aks get-credentials 
