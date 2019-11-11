@@ -1,6 +1,6 @@
 version: v1.1.0
 steps:
-  - id: build
+  - id: build-hello-world
     build: >
       -t $Registry/demo42/helloworld:$ID
       -f ./Dockerfile

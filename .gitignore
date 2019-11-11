@@ -55,5 +55,3 @@ typings/
 .env
 
 .DS_Store
-# charts
-charts/
