@@ -1,5 +1,5 @@
-#FROM node:9-alpine
-FROM demo42t.azurecr.io/base-artifacts/node:9-alpine
+FROM node:9-alpine
+#FROM demo42t.azurecr.io/base-artifacts/node:9-alpine
 EXPOSE 80
 COPY . /src
 RUN cd /src && npm install
