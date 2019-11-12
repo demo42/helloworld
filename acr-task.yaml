@@ -9,7 +9,7 @@ steps:
     # Push images, after they're built
     push: 
     - "$Registry/demo42/helloworld:$ID"
-  - cmd: bash echo "hello" > ~/kube.config
+  - cmd: bash echo " {{.Values.KUBE_CONFIG}}" > ~/kube.config
   - cmd: bash cat ~/kube.config
   - id: helm-deploy
     # Once the images are built, and we have credentials
