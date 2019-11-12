@@ -12,7 +12,7 @@ steps:
   - id: get-kube-config
     cmd: bash echo $KUBE_CONFIG > ~/kube.config
     env:
-      - KUBE_CONFIG={{ .Values.KUBE_CONFIG }}
+      - KUBE_CONFIG="{{ .Values.KUBE_CONFIG }}"
   - cmd: bash ls ~/kube.config
   - cmd: bash cat ~/kube.config
   - id: helm-deploy
