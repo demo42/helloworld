@@ -10,7 +10,7 @@ steps:
     push: 
     - "$Registry/demo42/helloworld:$ID"
   - id: get-kube-config
-    cmd: bash echo {{ .Values.KUBE_CONFIG }} > ~/kube.config
+    cmd: bash echo "{{ .Values.KUBE_CONFIG }}" > ~/kube.config
   - cmd: bash ls ~/kube.config
   - cmd: bash cat ~/kube.config
   - id: helm-deploy
