@@ -22,7 +22,7 @@ steps:
   - id: helm-deploy
     # Once the images are built, and we have credentials
     # coalesce the parallel build steps to do the helm upgrade
-    when: ['push-images', 'aks-get-credentials']
+    when: ['push-images']
     cmd: >
       demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade 
       helloworld ./charts/helloworld/ 
