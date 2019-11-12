@@ -38,6 +38,6 @@ steps:
     when: ['az-login', 'push-images']
     cmd: >
       az acr repository update 
-      --name $Registry
+      --name $RegistryName
       --image $Registry/demo42/helloworld:$ID
       --write-enabled false
