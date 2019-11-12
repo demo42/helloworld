@@ -39,5 +39,5 @@ steps:
     cmd: >
       az acr repository update 
       --name $RegistryName
-      --image $Registry/demo42/helloworld:$ID
+      --image demo42/helloworld:$ID
       --write-enabled false
