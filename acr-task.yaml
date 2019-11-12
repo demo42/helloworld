@@ -1,28 +1,21 @@
 version: v1.1.0
 steps:
   - id: build-hello-world
-    when: [-]
     build: >
       -f ./Dockerfile
       -t $Registry/demo42/helloworld:$ID
       .
-  - id: az-login
-    # login with the identity of the task
-    when: [-]
-    cmd: >
-      az login --identity -o jsonc > /dev/null
   - id: push-images
     # Push images, after they're built
-    when: ['build-hello-world']
     push: 
     - "$Registry/demo42/helloworld:$ID"
   - id: get-kube-config
     cmd: bash echo {{ .Values.KUBE_CONFIG }} > ~/kube.config
-
+  - cmd: bash ls ~/kube.config
+  - cmd: bash cat ~/kube.config
   - id: helm-deploy
     # Once the images are built, and we have credentials
     # coalesce the parallel build steps to do the helm upgrade
-    when: ['push-images']
     cmd: >
       demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade 
       helloworld ./charts/helloworld/ 
