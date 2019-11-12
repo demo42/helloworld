@@ -16,6 +16,13 @@ steps:
     when: ['build-hello-world']
     push: 
     - "$Registry/demo42/helloworld:$ID"
+  - id: lock-tag
+    when: ['push-images']
+    cmd: >
+      az acr repository update 
+      --name $Registry
+      --image $Registry/demo42/helloworld:$ID
+      --write-enabled false
   - id: aks-get-credentials
     # Get AKS credentials to initiate a helm deploy
     # This step is dependent on the az-login step, 
