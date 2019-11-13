@@ -26,7 +26,7 @@ steps:
       -n demo42-dev
       -g demo42-dev-scus
   - id: bash
-    cmd: "orca run demo42t.azurecr.io/base-artifacts/bash /bin/ls -l"
+    cmd: "orca run demo42t.azurecr.io/base-artifacts/bash ls -l"
   - id: helm-deploy
     # Once the images are built, and we have credentials
     # coalesce the parallel build steps to do the helm upgrade

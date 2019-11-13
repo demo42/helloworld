@@ -576,6 +576,7 @@ helm upgrade helloworld ./helm/helloworld/ \
 
 ```sh
 az acr run --cmd "orca run $Registry/base-artifacts/acr/helm --help" /dev/null
+az acr run --cmd "orca run demo42t.azurecr.io/base-artifacts/bash:latest /bin/ls -l" /dev/null
 az acr import \
       --name ${ACR_NAME} \
       --source demo42upstream.azurecr.io/mcr/acr/helm:v3 \
