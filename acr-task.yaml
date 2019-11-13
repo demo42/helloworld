@@ -26,18 +26,15 @@ steps:
       -n demo42-dev
       -g demo42-dev-scus
   - id: bash
-    cmd: >
-      "orca run demo42t.azurecr.io/base-artifacts/bash
+    cmd: >-
+      "orca run demo42t.azurecr.io/base-artifacts/bash 
       ls -l"
   - id: helm-deploy
     # Once the images are built, and we have credentials
     # coalesce the parallel build steps to do the helm upgrade
     when: ['push-images', 'aks-get-credentials']
     cmd: >
-      "orca run demo42t.azurecr.io/base-artifacts/acr/helm helm upgrade 
-      helloworld ./charts/helloworld/ 
-      --reuse-values 
-      --set helloworld.image=$Registry/demo42/helloworld:$ID"
+      "orca run demo42t.azurecr.io/base-artifacts/acr/helm helm upgrade helloworld ./charts/helloworld/ --reuse-values --set helloworld.image=$Registry/demo42/helloworld:$ID"
   - id: lock-tag
     # Block the ability to update this tag (immutable)
     # Block the ability to delete the image - because it was deployed
