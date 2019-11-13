@@ -574,3 +574,13 @@ helm upgrade helloworld ./helm/helloworld/ \
 [aks-configure-dns]: ./docs/aks-configure-dns.png
 [browse-helloworld]: ./docs/browse-helloworld.png
 
+```sh
+az acr run --cmd "orca run $Registry/base-artifacts/acr/helm --help" /dev/null
+az acr import \
+      --name ${ACR_NAME} \
+      --source demo42upstream.azurecr.io/mcr/acr/helm:v3 \
+      -t base-artifacts/acr/helm:v3 \
+      -t base-artifacts/acr/helm:latest \
+      -t base-artifacts/acr/helm:v3-$ID \
+      --force
+```

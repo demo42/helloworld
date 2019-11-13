@@ -30,7 +30,7 @@ steps:
     # coalesce the parallel build steps to do the helm upgrade
     when: ['push-images', 'aks-get-credentials']
     cmd: >
-      "orca run demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade 
+      "orca run $Registry/base-artifacts/acr/helm helm upgrade 
       helloworld ./charts/helloworld/ 
       --reuse-values 
       --set helloworld.image=$Registry/demo42/helloworld:$ID"
