@@ -1,7 +1,7 @@
 version: v1.1.0
 alias:
   values:
-    teleport : "orca run --mount type=bind,options=rbind:rw,source=/var/lib/docker/volumes/{{.Run.SharedVolume}}/_data,destination=/workspace --cwd /workspace"
+    teleport : "orca run --mount type=bind,options=rbind:rw,source=/var/lib/docker/volumes/{{.Run.SharedVolume}}/_data,destination=/workspace --mount type=bind,options=rbind:rw,source=/var/lib/docker/volumes/home/_data,destination=/home --cwd /workspace --env HOME=/home"
 steps:
   - id: build-hello-world
     when: [-]
