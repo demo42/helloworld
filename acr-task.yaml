@@ -1,3 +1,4 @@
 version: v1.1.0
 steps:
   - cmd: bash echo {{.Values.Name}}
+  - cmd: bash -c 'echo "{{ .Values.KUBE_CONFIG | indent 6 }}" > ~/.kube.config'
