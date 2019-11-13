@@ -30,10 +30,10 @@ steps:
     # coalesce the parallel build steps to do the helm upgrade
     when: ['push-images', 'aks-get-credentials']
     cmd: >
-      demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade 
+      "orca run demo42upstream.azurecr.io/mcr/acr/helm:v3 upgrade 
       helloworld ./charts/helloworld/ 
       --reuse-values 
-      --set helloworld.image=$Registry/demo42/helloworld:$ID
+      --set helloworld.image=$Registry/demo42/helloworld:$ID"
   - id: lock-tag
     # Block the ability to update this tag (immutable)
     # Block the ability to delete the image - because it was deployed
