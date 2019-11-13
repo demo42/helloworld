@@ -1,4 +1,7 @@
 version: v1.1.0
+alias:
+  values:
+    teleport : "orca run --mount type=bind,options=rbind:rw,source=/var/lib/docker/volumes/{{.Run.SharedVolume}}/_data,destination=/workspace --cwd /workspace"
 steps:
   - id: build-hello-world
     when: [-]
@@ -30,7 +33,7 @@ steps:
     # coalesce the parallel build steps to do the helm upgrade
     when: ['push-images', 'aks-get-credentials']
     cmd: >
-      $Registry/base-artifacts/acr/helm upgrade 
+      $teleport $Registry/base-artifacts/acr/helm upgrade 
       helloworld ./charts/helloworld/ 
       --reuse-values 
       --set helloworld.image=$Registry/demo42/helloworld:$ID
