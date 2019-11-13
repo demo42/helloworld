@@ -27,7 +27,7 @@ steps:
       -g demo42-dev-scus
   - id: bash
     cmd: >
-      "orca run demo42t.azurecr.io/base-artifacts/bash 
+      "orca run demo42t.azurecr.io/base-artifacts/bash
       ls -l"
   - id: helm-deploy
     # Once the images are built, and we have credentials
