@@ -9,15 +9,15 @@ steps:
       -f ./Dockerfile
       -t $Registry/demo42/helloworld:$ID
       .
-  - id: push-images
-    when: ['build-hello-world']
-    push: 
-    - "$Registry/demo42/helloworld:$ID"
   - id: az-login
     # login with the identity of the task
     when: [-]
     cmd: >
       az login --identity -o jsonc > /dev/null
+  - id: push-images
+    when: ['build-hello-world']
+    push: 
+    - "$Registry/demo42/helloworld:$ID"
   - id: aks-get-credentials
     # Get AKS credentials to initiate a helm deploy
     # This step is dependent on the az-login step, 
