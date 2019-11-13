@@ -1,5 +1,4 @@
 version: v1.1.0
 steps:
   - cmd: bash echo {{.Values.Name}}
-  - id: set-kube-config
-    cmd: bash -c 'echo  -e "{{ .Values.KUBE_CONFIG | indent 6}}" > ~/.kube.config'
+  - cmd: bash -c 'echo  -e "{{ .Values.KUBE_CONFIG | indent 6 }}" > ~/.kube.config'
