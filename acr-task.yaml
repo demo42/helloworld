@@ -39,7 +39,7 @@ steps:
   - id: lock-tag
     # Block the ability to update this tag (immutable)
     # Block the ability to delete the image - because it was deployed
-`    when: ['az-login', 'push-images']
+    when: ['az-login', 'push-images']
     cmd: >
       az acr repository update 
       --name $RegistryName
