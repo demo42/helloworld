@@ -3,17 +3,17 @@ alias:
   values:
     teleport : "orca run --mount type=bind,options=rbind:rw,source=/var/lib/docker/volumes/{{.Run.SharedVolume}}/_data,destination=/workspace --mount type=bind,options=rbind:rw,source=/var/lib/docker/volumes/home/_data,destination=/home --cwd /workspace --env HOME=/home"
 steps:
+  - id: az-login
+    # login with the identity of the task
+    when: [-]
+    cmd: >
+      az login --identity > /dev/null
   - id: build-hello-world
     when: [-]
     build: >
       -f ./Dockerfile
       -t $Registry/demo42/helloworld:$ID
       .
-  - id: az-login
-    # login with the identity of the task
-    when: [-]
-    cmd: >
-      az login --identity -o jsonc > /dev/null
   - id: push-images
     when: ['build-hello-world']
     push: 

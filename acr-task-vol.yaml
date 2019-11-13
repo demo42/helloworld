@@ -7,4 +7,8 @@ steps:
   - cmd: $teleport demo42t.azurecr.io/base-artifacts/bash /bin/sh -c 'echo somethingelse >> $HOME/test'
   - cmd: $teleport demo42t.azurecr.io/base-artifacts/bash cat /home/test
 
+version: v1.1.0
+steps:
+  - cmd: bash echo {{.Values.Name}}
+  - cmd: bash -c 'echo "{{ .Values.KUBE_CONFIG | indent 9 }}" > ~/.kube.config'
   
