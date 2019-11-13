@@ -25,7 +25,7 @@ steps:
     # which is running concurrently with the build
     when: ['az-login']
     cmd: >
-      az aks get-credentials 
+      $teleport az aks get-credentials 
       -n demo42-dev
       -g demo42-dev-scus
   - id: helm-deploy
