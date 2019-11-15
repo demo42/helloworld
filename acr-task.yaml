@@ -24,7 +24,7 @@ steps:
     # which is running concurrently with the build
     when: ['az-login']
     cmd: >
-      az aks get-credentials 
+      az aks get-credentials
       -n demo42-dev
       -g demo42-dev-scus
   - id: helm-deploy
@@ -32,9 +32,9 @@ steps:
     # coalesce the parallel build steps to do the helm upgrade
     when: ['push-images', 'aks-get-credentials']
     cmd: >
-      $teleport $Registry/base-artifacts/acr/helm helm upgrade 
-      helloworld ./charts/helloworld/ 
-      --reuse-values 
+      $teleport $Registry/base-artifacts/acr/helm helm upgrade
+      helloworld ./charts/helloworld/
+      --reuse-values
       --set helloworld.image=$Registry/demo42/helloworld:$ID
   - id: lock-tag
     # Block the ability to update this tag (immutable)
