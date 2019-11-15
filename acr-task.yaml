@@ -32,7 +32,7 @@ steps:
     # coalesce the parallel build steps to do the helm upgrade
     when: ['push-images', 'aks-get-credentials']
     cmd: >
-      $teleport {{.Run.Registry}}/base-artifacts/acr/helm upgrade
+      $teleport $Registry/base-artifacts/acr/helm upgrade
       helloworld ./charts/helloworld/
       --reuse-values
       --set helloworld.image=$Registry/demo42/helloworld:$ID
