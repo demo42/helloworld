@@ -13,7 +13,7 @@ var server = http.createServer(function (request, response) {
   response.write('<a href="https://aka.ms/acr/tasks">https://aka.ms/acr/tasks</a>');
   response.write('<a href="https://aka.ms/teleport/signup">https://aka.ms/teleport/signup</a>');
 
-  response.write('<p>Hello Automated build & Deploy</p>');
+  response.write('<p>Hello World</p>');
 
   response.write('<p><b>Version:</b> '+process.env.NODE_VERSION+'</p>');
   response.write('<p><b>Background Color:</b> '+process.env.BACKGROUND_COLOR+'</p>');
