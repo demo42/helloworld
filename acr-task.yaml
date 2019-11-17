@@ -5,19 +5,18 @@ alias:
 steps:
   - id: az-login
     # login with the identity of the task
-    when: [-]
     cmd: >
       az login --identity > /dev/null
   - id: build-hello-world
     when: [-]
     build: >
       -f ./Dockerfile
-      -t $Registry/demo42/helloworld:$ID
+      -t $Registry/demo42/helloworld:{{.Run.ID}}
       .
   - id: push-images
     when: ['build-hello-world']
     push: 
-    - "$Registry/demo42/helloworld:$ID"
+    - "$Registry/demo42/helloworld:{{.Run.ID}}"
   - id: aks-get-credentials
     # Get AKS credentials to initiate a helm deploy
     # This step is dependent on the az-login step, 
@@ -35,7 +34,7 @@ steps:
       $teleport $Registry/base-artifacts/acr/helm:v3 upgrade
       helloworld ./charts/helloworld/
       --reuse-values
-      --set helloworld.image=$Registry/demo42/helloworld:$ID
+      --set helloworld.image=$Registry/demo42/helloworld:{{.Run.ID}}
   - id: lock-tag
     # Block the ability to update this tag (immutable)
     # Block the ability to delete the image - because it was deployed
