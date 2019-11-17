@@ -32,7 +32,7 @@ steps:
     when: ['push-images', 'aks-get-credentials']
     #$teleport 
     cmd: >
-      $teleport $Registry/base-artifacts/acr/helm:v3 upgrade
+      $Registry/base-artifacts/acr/helm:v3 upgrade
       helloworld ./charts/helloworld/
       --reuse-values
       --set helloworld.image=$Registry/demo42/helloworld:{{.Run.ID}}
