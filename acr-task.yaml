@@ -11,12 +11,12 @@ steps:
     when: [-]
     build: >
       -f ./Dockerfile
-      -t $Registry/demo42/helloworld:{{.Run.ID}}
+      -t {{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
       .
   - id: push-images
     when: ['build-hello-world']
     push: 
-    - "$Registry/demo42/helloworld:{{.Run.ID}}"
+    - "{{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}"
   - id: aks-get-credentials
     # Get AKS credentials to initiate a helm deploy
     # This step is dependent on the az-login step, 
@@ -32,17 +32,17 @@ steps:
     when: ['push-images', 'aks-get-credentials']
     #$teleport 
     cmd: >
-      $Registry/base-artifacts/acr/helm:v3 upgrade
+      $teleport {{.Run.Registry}}/base-artifacts/acr/helm:v3 upgrade
       helloworld ./charts/helloworld/
       --reuse-values
-      --set helloworld.image=$Registry/demo42/helloworld:{{.Run.ID}}
+      --set helloworld.image={{.Run.Registry}}/demo42/helloworld:{{.Run.ID}}
   - id: lock-tag
     # Block the ability to update this tag (immutable)
     # Block the ability to delete the image - because it was deployed
     when: ['az-login', 'push-images']
     cmd: >
       az acr repository update 
-      --name $RegistryName
+      --name {{.Run.RegistryName}}
       --image demo42/helloworld:$ID
       --write-enabled false
       --delete-enabled false 
